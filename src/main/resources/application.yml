@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: restaurantFoodAndMore
+  profiles:
+    include:
+      - info
+  datasource:
+    url: jdbc:postgresql://localhost:5432/food_and_more
+    username: postgres
+    password: system
+  jpa:
+    properties:
+      hibernate:
+        default_schema: public
+        order_by:
+          default_null_ordering: last
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: validate
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:dbchangelog.xml
+jwt:
+  security: food_and_more_secret
+  expiration: 43500
+path:
+  image-path: C:/Users/USUARIO/Desktop/repositorioApp

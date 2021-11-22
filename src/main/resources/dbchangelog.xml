@@ -1,0 +1,355 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+   http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="Diego Acosta" id="script01">
+        <createTable tableName="sec_users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="users_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reset_password" defaultValueBoolean="true" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="sec_roles">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="roles_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="sec_user_rol">
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rol_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_user_rol" columnNames="user_id,rol_id"/>
+        <addForeignKeyConstraint baseTableName="sec_user_rol" baseColumnNames="user_id"
+                                 constraintName="fk_user_id_roles"
+                                 referencedTableName="sec_users" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="sec_user_rol" baseColumnNames="rol_id"
+                                 constraintName="fk_rol_id_users"
+                                 referencedTableName="sec_roles" referencedColumnNames="id"/>
+        <createTable tableName="sec_permissions">
+            <column name="id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_permissions" columnNames="id"/>
+        <createTable tableName="sec_rol_permissions">
+            <column name="rol_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_rol_permissions" columnNames="rol_id,permission_id"/>
+        <addForeignKeyConstraint baseTableName="sec_rol_permissions" baseColumnNames="rol_id"
+                                 constraintName="fk_roles_id_roles"
+                                 referencedTableName="sec_roles" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="sec_rol_permissions" baseColumnNames="permission_id"
+                                 constraintName="fk_rol_id_permission"
+                                 referencedTableName="sec_permissions" referencedColumnNames="id"/>
+        <createTable tableName="com_companies">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="company_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="update_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name_company" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identification" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="pro_catalogs">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="catalog_pkey"/>
+            </column>
+            <column name="company_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="pro_catalogs" baseColumnNames="company_id"
+                                 constraintName="fk_catalog_company"
+                                 referencedTableName="com_companies" referencedColumnNames="id"/>
+        <createTable tableName="pro_type_product">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="type_product_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="pro_category_product">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="category_product_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="pro_tax_product">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="tax_product_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_tax" type="NUMERIC">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="pro_product">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="product_pkey"/>
+            </column>
+            <column name="type_product_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_product_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tax_product_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="purchase_price" type="NUMERIC">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sale_price" type="NUMERIC">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="pro_product" baseColumnNames="type_product_id"
+                                 constraintName="fk_type_product_product"
+                                 referencedTableName="pro_type_product" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="pro_product" baseColumnNames="category_product_id"
+                                 constraintName="fk_category_product_product"
+                                 referencedTableName="pro_category_product" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="pro_product" baseColumnNames="tax_product_id"
+                                 constraintName="fk_tax_product_product"
+                                 referencedTableName="pro_tax_product" referencedColumnNames="id"/>
+        <createTable tableName="pro_catalogs_products">
+            <column name="catalog_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="pro_catalogs_products" columnNames="catalog_id, product_id"/>
+        <addForeignKeyConstraint baseTableName="pro_catalogs_products" baseColumnNames="catalog_id"
+                                 constraintName="fk_catalog_id_products"
+                                 referencedTableName="pro_catalogs" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="pro_catalogs_products" baseColumnNames="product_id"
+                                 constraintName="fk_product_id_catalogs"
+                                 referencedTableName="pro_product" referencedColumnNames="id"/>
+        <createTable tableName="pro_product_stock">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="product_stock_pkey"/>
+            </column>
+            <column name="product_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stock_actual" type="NUMERIC">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="pro_product_stock" baseColumnNames="product_id"
+                                 constraintName="fk_products_product_stock"
+                                 referencedTableName="pro_product" referencedColumnNames="id"/>
+        <createTable tableName="pro_product_movement">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="product_movement_pkey"/>
+            </column>
+            <column name="product_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_movement" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_document" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="movement_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="NUMERIC">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="pro_product_movement" baseColumnNames="product_id"
+                                 constraintName="fk_products_movement"
+                                 referencedTableName="pro_product" referencedColumnNames="id"/>
+        <createTable tableName="per_person">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="person_pkey"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="true"/>
+            </column>
+            <column name="dni" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="birthday" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="image" type="VARCHAR(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="state" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="per_person" baseColumnNames="user_id"
+                                 constraintName="fk_person_user"
+                                 referencedTableName="sec_users" referencedColumnNames="id"/>
+        <createTable tableName="per_phone">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="per_phone_pkey"/>
+            </column>
+            <column name="person_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_phone" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="per_phone" baseColumnNames="person_id"
+                                 constraintName="fk_person_phone"
+                                 referencedTableName="per_person" referencedColumnNames="id"/>
+        <createTable tableName="per_address">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="per_address_pkey"/>
+            </column>
+            <column name="person_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_address" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="per_address" baseColumnNames="person_id"
+                                 constraintName="fk_person_address"
+                                 referencedTableName="per_person" referencedColumnNames="id"/>
+        <createTable tableName="sec_user_company">
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_user_company" columnNames="user_id,company_id"/>
+        <addForeignKeyConstraint baseTableName="sec_user_company" baseColumnNames="user_id"
+                                 constraintName="fk_user_id_company"
+                                 referencedTableName="sec_users" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="sec_user_company" baseColumnNames="company_id"
+                                 constraintName="fk_company_id_users"
+                                 referencedTableName="com_companies" referencedColumnNames="id"/>
+    </changeSet>
+    <include file="data.sql"/>
+
+</databaseChangeLog>
